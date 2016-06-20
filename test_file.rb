@@ -4,13 +4,15 @@ class TestFile
   # Constructor
   public def initialize(file_name)
     @file_name = file_name
-    @file_exists = File.exists?(@file_name)
+    @file_exists = File.exists?(@file_name) && !File.zero?(file_name)
     @describes = {}
 
     if file_exists?
       parse_code
       find_describes
     end
+  rescue Exception => e
+    raise RuntimeError, "Error while processing file #{file_name}: #{e.message}", e.backtrace
   end
 
 

@@ -8,10 +8,14 @@ class SourceFile
     @coverage = 0
     @hints = []
 
-    parse_code
-    find_classes
-    find_test_file
-    calculate_coverage
+    unless File.zero?(file_name)
+      parse_code
+      find_classes
+      find_test_file
+      calculate_coverage
+    end
+  rescue Exception => e
+    raise RuntimeError, "Error while processing file #{file_name}: #{e.message}", e.backtrace
   end
 
 
