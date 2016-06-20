@@ -62,6 +62,7 @@ class SourceFile
   # Find the spec file for that class
   private def find_test_file
     relative_file_name = @file_name.to_s.gsub(APP_ROOT, '')
+    relative_file_name.gsub!('/app', '')
     @test_file = TestFile.new(APP_ROOT + '/spec' + relative_file_name.gsub('.rb', '_spec.rb'))
   end
 end
