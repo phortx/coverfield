@@ -26,9 +26,12 @@ class Coverfield::TestFile
   public def cover?(class_name, method_name)
     return false unless file_exists?
 
-    @describes.each_pair do |subject, test_method|
-      return true if subject == class_name && test_method == method_name
+    @describes.each_pair do |subject, test_methods|
+      return true if subject == class_name &&
+                     test_methods.include?(method_name.to_s)
     end
+
+    false
   end
 
 
@@ -41,7 +44,7 @@ class Coverfield::TestFile
       subject_ary << const_name
     end
 
-    subject_ary * '::'
+    subject_ary.reverse * '::'
   end
 
 

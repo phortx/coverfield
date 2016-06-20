@@ -10,6 +10,12 @@ class Coverfield::SourceClass
     find_methods
   end
 
+  public def full_qualified_name
+    name = @name
+    name = "#{@module_name}::#{name}" unless @module_name.empty?
+    name
+  end
+
   # Finds all methods
   private def find_methods
     node.each_node(:def) do |node|

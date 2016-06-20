@@ -29,7 +29,7 @@ class Coverfield::SourceFile
 
     classes.each do |cls|
       cls.methods.each do |method_name|
-        if test_file.cover?(cls, method_name)
+        if test_file.cover?(cls.full_qualified_name, method_name)
           @coverage += 1
         else
           method_name = "#{cls.name}.#{method_name}".red
