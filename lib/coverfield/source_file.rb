@@ -33,7 +33,7 @@ class Coverfield::SourceFile
           @coverage += 1
         else
           method_name = "#{cls.name}.#{method_name}".red
-          @hints << "Missing test vor #{method_name} in #{test_file.relative_file_name.yellow}"
+          @hints << "Missing test for #{method_name} in #{test_file.relative_file_name.yellow}"
         end
       end
     end

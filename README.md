@@ -65,13 +65,13 @@ Coverfield requires you to have a specific architecture of your RSpec Suite.
 1. All specs are located in `spec/`.
 2. Within `spec` all specs are placed in the same path as the file which is
    tested by the spec. For example the spec for the file
-   `/lib/some/nice_code.rb` have to be placed in
-   `/spec/lib/some/nice_code_spec.rb`. And the spec for the file
+   `/lib/some/nice_class.rb` have to be placed in
+   `/spec/lib/some/nice_class_spec.rb`. And the spec for the file
    `/app/models/post.rb` goes to `/spec/models/post.rb`
    [Why?](http://stackoverflow.com/questions/14180003/rspec-naming-conventions-for-files-and-directory-structure)
-3. The first and outer `describe` call have to be built like that:
-   `describe Some::NiceCode do` assuming, that `/lib/some/nice_code.rb` defines
-   the class `Some::NiceCode`.
+3. The first `describe` call have to be built like that:
+   `describe Some::NiceClass do` assuming, that `/lib/some/nice_code.rb` defines
+   the class `Some::NiceClass`.
    [Why?](http://rspec.info/documentation/3.4/rspec-core/#Basic_Structure)
 4. All inner `describe` calls for the methods have to be built like that:
    `describe '#method_name' do`. The `#` is optional and may also be a `.`.
