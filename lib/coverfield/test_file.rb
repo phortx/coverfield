@@ -1,5 +1,5 @@
-class TestFile
-  attr_reader :file_name
+class Coverfield::TestFile
+  include Coverfield::FileMethods
 
   # Constructor
   public def initialize(file_name)
@@ -29,12 +29,6 @@ class TestFile
     @describes.each_pair do |subject, test_method|
       return true if subject == class_name && test_method == method_name
     end
-  end
-
-
-  # Parses the source code
-  private def parse_code
-    @processed_source = RuboCop::ProcessedSource.from_file(@file_name, 2.3)
   end
 
 

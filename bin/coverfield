@@ -8,9 +8,10 @@ require 'colorize'
 
 APP_ROOT = Bundler.root.to_s
 
-require_relative 'source_class'
-require_relative 'source_file'
-require_relative 'test_file'
+require 'coverfield'
+require 'coverfield/source_class'
+require 'coverfield/source_file'
+require 'coverfield/test_file'
 
 
 # Ensure there are paths to search for
@@ -24,7 +25,7 @@ target_files = target_finder.find(paths)
 
 
 # Map all found files to SourceFiles
-source_files = target_files.map { |file| SourceFile.new(file) }
+source_files = target_files.map { |file| Coverfield::SourceFile.new(file) }
 
 overall_covered = 0
 overall_methods = 0
@@ -35,7 +36,7 @@ source_files.each do |file|
     class_name = (cls.module_name.to_s + (cls.module_name.empty? ? '' : '::') + cls.name.to_s).light_blue
     coverage = "#{file.coverage}/#{cls.methods.size}"
     covered = file.coverage == cls.methods.size
-    puts "#{covered ? '[X]'.green : '[ ]'.red} Found class: #{class_name} with #{covered ? coverage.green : coverage.red} covered methods in #{file.file_name.light_blue}".bold
+    puts "#{covered ? '[X]'.green : '[ ]'.red} Found class: #{class_name} with #{covered ? coverage.green : coverage.red} covered methods in #{file.relative_file_name.light_blue}".bold
 
     file.hints.each do |hint|
       puts "    - #{hint}"

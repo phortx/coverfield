@@ -1,5 +1,9 @@
-class SourceFile
-  attr_reader :file_name, :classes, :test_file, :coverage, :hints
+require 'coverfield/file_methods'
+
+class Coverfield::SourceFile
+  include Coverfield::FileMethods
+
+  attr_reader :classes, :test_file, :coverage, :hints
 
   # Constructor
   public def initialize(file_name)
@@ -29,16 +33,10 @@ class SourceFile
           @coverage += 1
         else
           method_name = "#{cls.name}.#{method_name}".red
-          @hints << "Missing test vor #{method_name} in #{test_file.file_name.yellow}"
+          @hints << "Missing test vor #{method_name} in #{test_file.relative_file_name.yellow}"
         end
       end
     end
-  end
-
-
-  # Parse the source code
-  private def parse_code
-    @processed_source = RuboCop::ProcessedSource.from_file(@file_name, 2.3)
   end
 
 
@@ -54,7 +52,7 @@ class SourceFile
         module_name = scope_name.to_s
       end
 
-      @classes << SourceClass.new(const_name, module_name, node)
+      @classes << Coverfield::SourceClass.new(const_name, module_name, node)
     end
   end
 
@@ -63,6 +61,6 @@ class SourceFile
   private def find_test_file
     relative_file_name = @file_name.to_s.gsub(APP_ROOT, '')
     relative_file_name.gsub!('/app', '')
-    @test_file = TestFile.new(APP_ROOT + '/spec' + relative_file_name.gsub('.rb', '_spec.rb'))
+    @test_file = Coverfield::TestFile.new(APP_ROOT + '/spec' + relative_file_name.gsub('.rb', '_spec.rb'))
   end
 end

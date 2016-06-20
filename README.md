@@ -31,7 +31,7 @@ test suite.
 ## Future
 
 This project has still prototype character and there's plenty to do like
-respecting `:nocov:` tags, refactor to a gem and so on.
+respecting `:nocov:` tags and so on.
 
 And I'm gonna contact [Christoph Olszowka](https://github.com/colszowka) to ask
 him if there is a chance that this code will be included to SimpleCov in some
@@ -53,7 +53,9 @@ will be some kind of integration in the future.
 
 ## Usage
 
-Just call `../path/to/coverfield lib app` in your apps root dir.
+Install via `gem install coverfield`.
+
+Then just call `coverfield lib/ app/` in your apps root dir.
 
 
 ### Considerations
@@ -74,6 +76,3 @@ Coverfield requires you to have a specific architecture of your RSpec Suite.
 4. All inner `describe` calls for the methods have to be built like that:
    `describe '#method_name' do`. The `#` is optional and may also be a `.`.
    [Why?](http://betterspecs.org/#describe)
-5. (Currently until refactoring to a gem is done): The
-   [RuboCop](https://github.com/bbatsov/rubocop) and
-   [Colorizer](https://github.com/fazibear/colorize) gems have to be installed.

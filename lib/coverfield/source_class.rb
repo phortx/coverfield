@@ -1,4 +1,4 @@
-class SourceClass
+class Coverfield::SourceClass
   attr_reader :name, :module_name, :node, :methods
 
   # Constructor
