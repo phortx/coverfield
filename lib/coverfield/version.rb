@@ -1,5 +1,5 @@
 module Coverfield
-  version = '0.0.2'
+  version = '0.0.3'
 
   def version.to_a
     split('.').map(&:to_i)
