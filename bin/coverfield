@@ -9,9 +9,9 @@ require 'colorize'
 APP_ROOT = Bundler.root.to_s
 
 require 'coverfield'
-require 'coverfield/source_class'
-require 'coverfield/source_file'
-require 'coverfield/test_file'
+require 'coverfield/source/class'
+require 'coverfield/source/file'
+require 'coverfield/source/test_file'
 
 
 # Ensure there are paths to search for
@@ -25,31 +25,41 @@ target_files = target_finder.find(paths)
 
 
 # Map all found files to SourceFiles
-source_files = target_files.map { |file| Coverfield::SourceFile.new(file) }
+source_files = target_files.map { |file| Coverfield::Source::File.new(file) }
 
-overall_covered = 0
-overall_methods = 0
 
-# Iterate over all found files and their classes
+# Initialize counter variables
+total_covered = 0
+total_methods = 0
+total_relevant_methods = 0
+
+# Iterate over all found files and their classes for fancy output
 source_files.each do |file|
   file.classes.each do |cls|
-    class_name = (cls.module_name.to_s + (cls.module_name.empty? ? '' : '::') + cls.name.to_s).light_blue
-    coverage = "#{file.coverage}/#{cls.methods.size}"
-    covered = file.coverage == cls.methods.size
+    class_name = cls.full_qualified_name.to_s.light_blue
+    coverage = "#{file.coverage}/#{cls.relevant_method_count}/#{cls.method_count}"
+    covered = file.coverage == cls.relevant_method_count
     puts "#{covered ? '[X]'.green : '[ ]'.red} Found class: #{class_name} with #{covered ? coverage.green : coverage.red} covered methods in #{file.relative_file_name.light_blue}".bold
 
     file.hints.each do |hint|
       puts "    - #{hint}"
     end
 
-    overall_methods += cls.methods.size
-    overall_covered += file.coverage
+    total_methods += cls.method_count
+    total_relevant_methods += cls.relevant_method_count
+    total_covered += file.coverage
 
     puts
   end
 end
 
+relevant_percent = (total_relevant_methods * 100 / total_methods).round.to_s + '%'
+covered_percent = (total_covered * 100 / total_methods).round.to_s + '%'
+uncovered_percent = ((total_relevant_methods - total_covered) * 100 / total_methods).round.to_s + '%'
 
 puts
-puts "Have found #{overall_methods.to_s.yellow} methods and #{overall_covered.to_s.yellow} are covered by tests. Thus there are #{(overall_methods - overall_covered).to_s.yellow} uncovered methods."
+puts "There are #{total_methods.to_s.yellow} methods in total."
+puts "#{total_relevant_methods.to_s.yellow} (#{relevant_percent.yellow}) of them are relevant for coverage."
+puts "And #{total_covered.to_s.yellow} (#{covered_percent.yellow}) methods are covered by tests."
+puts "Thus there are #{(total_relevant_methods - total_covered).to_s.yellow} (#{uncovered_percent.yellow}) uncovered methods."
 puts

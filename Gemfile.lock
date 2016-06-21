@@ -1,7 +1,7 @@
 PATH
   remote: .
   specs:
-    coverfield (0.0.2)
+    coverfield (0.1.0)
       colorize (~> 0.7)
       rubocop (~> 0.40)
 
@@ -31,4 +31,4 @@ DEPENDENCIES
   coverfield!
 
 BUNDLED WITH
-   1.12.4
+   1.12.5

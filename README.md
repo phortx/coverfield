@@ -1,5 +1,9 @@
 # Coverfield
 
+[![Gem Version](http://img.shields.io/gem/v/coverfield.svg)](http://badge.fury.io/rb/coverfield)
+
+**Warning:** Alpha Release, do not rely on or use in production yet!
+
 One day I found a class in my ruby app with > 95% coverage in
 [SimpleCov](https://github.com/colszowka/simplecov) but without any dedicated
 spec. SimpleCov is an awesome tool if you want to get an idea of your test
@@ -30,11 +34,11 @@ test suite.
 
 ## Future
 
-This project has still prototype character and there's plenty to do like
-respecting `:nocov:` tags and so on.
+This project has still prototype character (this is an alpha release) and
+there's plenty to do (specs for example).
 
-And I'm gonna contact [Christoph Olszowka](https://github.com/colszowka) to ask
-him if there is a chance that this code will be included to SimpleCov in some
+And I wrote [Christoph Olszowka](https://github.com/colszowka) to ask
+him if there is a chance that this will be included to SimpleCov in some
 way. I would really appreciate that!
 
 
@@ -66,8 +70,9 @@ Coverfield requires you to have a specific architecture of your RSpec Suite.
 2. Within `spec` all specs are placed in the same path as the file which is
    tested by the spec. For example the spec for the file
    `/lib/some/nice_class.rb` have to be placed in
-   `/spec/lib/some/nice_class_spec.rb`. And the spec for the file
-   `/app/models/post.rb` goes to `/spec/models/post.rb`
+   `/spec/lib/some/nice_class_spec.rb` or `/spec/some/nice_class_spec.rb`.
+   And the spec for the file `/app/models/post.rb` goes to
+   `/spec/app/models/post.rb` or `/spec/models/post.rb`
    [Why?](http://stackoverflow.com/questions/14180003/rspec-naming-conventions-for-files-and-directory-structure)
 3. The first `describe` call have to be built like that:
    `describe Some::NiceClass do` assuming, that `/lib/some/nice_code.rb` defines
@@ -76,3 +81,4 @@ Coverfield requires you to have a specific architecture of your RSpec Suite.
 4. All inner `describe` calls for the methods have to be built like that:
    `describe '#method_name' do`. The `#` is optional and may also be a `.`.
    [Why?](http://betterspecs.org/#describe)
+5. All dependencies of your app have to be installed (`bundle install`).

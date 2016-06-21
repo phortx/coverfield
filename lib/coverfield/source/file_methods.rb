@@ -1,4 +1,4 @@
-module Coverfield::FileMethods
+module Coverfield::Source::FileMethods
   attr_reader :file_name
 
   # Parse the source code

@@ -1,5 +1,7 @@
-class Coverfield::TestFile
-  include Coverfield::FileMethods
+require 'coverfield/source/file_methods'
+
+class Coverfield::Source::TestFile
+  include Coverfield::Source::FileMethods
 
   # Constructor
   public def initialize(file_name)
@@ -37,6 +39,7 @@ class Coverfield::TestFile
 
   # Small helper method which builts the full qualified class name out of a describe arguments node
   private def get_spec_class_name(describe_args_node)
+    return describe_args_node if describe_args_node.is_a?(String)
     subject_ary = []
 
     describe_args_node.each_node(:const) do |const_part|
@@ -52,6 +55,7 @@ class Coverfield::TestFile
   private def find_describes
     # Contains the current test subject where alls test methods should be associated with
     current_subject = nil
+    first_describe = true
 
     # Iterate over all send nodes (method calls)
     @processed_source.ast.each_node(:send) do |node|
@@ -60,15 +64,25 @@ class Coverfield::TestFile
 
       # We only care if it's a describe() call
       if method_name == :describe
-        if args.const_type?
+        if first_describe || args.const_type?
           # If it's a const, it's the first describe, which describes the class/module to test
           current_subject = get_spec_class_name(args)
           @describes[current_subject] = []
         else
           # Otherwise, get the String argument, it will contain something like '#method_name'
           value, nothing = *args.each_node(:str).first
+
+          if value == nil
+            # That happens if the argument is a symbol
+            value, nothing = *args.each_node(:sym).first
+            value = value.to_s
+          end
+
           @describes[current_subject] << value.strip.gsub(/^(?:\.|#)(.+)$/i, '\1')
+
         end
+
+        first_describe = false
       end
     end
   end
