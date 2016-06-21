@@ -30,6 +30,8 @@ covered by specs and which not. SimpleCov then tells you how well the body of
 those methods is tested and if there are edge cases which are not touched by the
 test suite.
 
+[Click here for a screenshot of the coverfield generated report](https://twitter.com/phortx/status/745256593625911296).
+
 
 
 ## Future
