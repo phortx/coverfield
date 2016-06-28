@@ -1,14 +1,18 @@
 require 'coverfield/source/file_methods'
 
+# Represents a spec file
 class Coverfield::Source::TestFile
   include Coverfield::Source::FileMethods
 
+
   # Constructor
-  public def initialize(file_name)
-    @file_name = file_name
-    @file_exists = File.exists?(@file_name) && !File.zero?(file_name)
+  public def initialize(config, file_name)
+    @config = config
+    @file_name = config.app_root + '/' + file_name
+    @file_exists = File.exists?(file_name) && !File.zero?(file_name)
     @describes = {}
 
+    # If the file doesn't exist, do nothing
     if file_exists?
       parse_code
       find_describes
@@ -24,7 +28,7 @@ class Coverfield::Source::TestFile
   end
 
 
-  # Tells if that file covers a class_name method_name pair
+  # Tells if that file covers a method of a class pair
   public def cover?(class_name, method_name)
     return false unless file_exists?
 
@@ -37,9 +41,14 @@ class Coverfield::Source::TestFile
   end
 
 
-  # Small helper method which builts the full qualified class name out of a describe arguments node
+  # Helper method which builts the full qualified class name out of
+  # a describe arguments node
   private def get_spec_class_name(describe_args_node)
+    # If the argument is already a string, there's nothing to do
     return describe_args_node if describe_args_node.is_a?(String)
+
+    # Otherwise it's a constant chain like Coverfield::Source::TestFile
+    # which will be concatenated
     subject_ary = []
 
     describe_args_node.each_node(:const) do |const_part|
@@ -78,8 +87,8 @@ class Coverfield::Source::TestFile
             value = value.to_s
           end
 
+          # Remove the . or # from the string
           @describes[current_subject] << value.strip.gsub(/^(?:\.|#)(.+)$/i, '\1')
-
         end
 
         first_describe = false

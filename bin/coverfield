@@ -2,24 +2,21 @@
 
 # Run that script in your apps root.
 
-require 'bundler'
 require 'colorize'
-
-APP_ROOT = Bundler.root.to_s
-
 require 'coverfield'
+require 'coverfield/cli'
 require 'coverfield/report'
 
 
-# Ensure there are paths to search for
-paths = ARGV
-paths = [APP_ROOT + '/lib'] if paths.empty?
+# Load the Command Line Interface to parse the options and arguments.
+# That also initializes the config, which will be available via cli.config
+cli = Coverfield::CLI.new
 
 
-# Find files
-source_files = Coverfield.find_source_files(paths)
+# Find all source files based on the include_paths in the config
+source_files = Coverfield.find_source_files(cli.config)
 
 
-# Initialize counter variables
-report = Coverfield::Report.new(source_files)
+# Create and print the report
+report = Coverfield::Report.new(cli.config, source_files)
 puts report.full_report

@@ -3,19 +3,21 @@ require 'coverfield/source/test_file'
 require 'coverfield/source/class'
 require 'coverfield/source/nocov_range'
 
+# Represents a ruby source file which consists of classes
 class Coverfield::Source::File
   include Coverfield::Source::FileMethods
 
-  attr_reader :classes, :test_file, :coverage, :hints
+  attr_reader :classes, :test_file
+
 
   # Constructor
-  public def initialize(file_name)
+  public def initialize(config, file_name)
+    @config = config
     @file_name = file_name
     @classes = []
-    @coverage = 0
-    @hints = []
     @nocov_ranges = []
 
+    # Ignore empty files
     unless File.zero?(file_name)
       parse_code
       find_nocov_ranges
@@ -28,28 +30,13 @@ class Coverfield::Source::File
   end
 
 
-  # Calculates the number of covered methods of this file and sets @coverage and @hints
+  # Iterates over all classes and calculates their test coverage
   private def calculate_coverage
-    @coverage = 0
-
-    classes.each do |cls|
-      cls.methods.each do |method|
-        if test_file.cover?(cls.full_qualified_name, method.name)
-          @coverage += 1
-        else
-          method_name = "#{cls.name}.#{method.name}".red
-
-          if method.nocov?
-            @coverage += 1
-          else
-            @hints << "Missing test for #{method_name} in #{test_file.relative_file_name.yellow}"
-          end
-        end
-      end
-    end
+    classes.each { |cls| cls.calculate_coverage }
   end
 
 
+  # Tells if a method node is located within two :nocov: tags
   public def nocov?(method_body_node)
     @nocov_ranges.each do |nocov_range|
       return true if nocov_range.includes?(method_body_node)
@@ -59,18 +46,20 @@ class Coverfield::Source::File
   end
 
 
-  # Find class definitions
+  # Finds all class definitions within that file
   private def find_classes
     @processed_source.ast.each_node(:class) do |node|
       name, superclass, body = *node
       _scope, const_name, value = *name
       module_name = node.parent_module_name
 
+      # If the module_name is 'Object', the notation is not Coverfield::Source::TestFile but nested modules/class
       if module_name == 'Object'
         nothing, scope_name, nothing = *_scope
         module_name = scope_name.to_s
       end
 
+      # Create a new class object and push that to the @classes array
       @classes << Coverfield::Source::Class.new(const_name, module_name, node, self)
     end
   end
@@ -78,24 +67,30 @@ class Coverfield::Source::File
 
   # Find the spec file for that class
   private def find_test_file
-    spec_path = APP_ROOT + '/spec'
-    relative_file_name = @file_name.to_s.gsub(APP_ROOT, '')
-    @test_file = Coverfield::Source::TestFile.new(spec_path + relative_file_name.gsub('.rb', '_spec.rb'))
+    allowed_test_files.each do |file|
+      @test_file = Coverfield::Source::TestFile.new(@config, file)
 
-    # When no file was found also try without '/lib' or '/app'
-    unless @test_file.file_exists?
-      relative_file_name.gsub!(/^\/(lib|app)/, '')
-      @test_file = Coverfield::Source::TestFile.new(spec_path + relative_file_name)
+      # break
+      return false if test_file.file_exists?
     end
   end
 
 
+  public def allowed_test_files
+    template = (@config.spec_dir + relative_file_name).gsub('.rb', '_spec.rb')
+    allowed_files = *template
+    allowed_files << template.gsub(/^\/(lib|app)/, '')
+    allowed_files
+  end
+
+
+  # Collects all :nocov: tag ranges in the file
   private def find_nocov_ranges
     first = true
     line = 0
 
     @processed_source.comments.each do |comment|
-      if comment.type == :inline && comment.text.strip =~ /^#\s*\:nocov\:/
+      if comment.type == :inline && comment.text.strip =~ /^#\s*:nocov:/
         if first
           line = comment.loc.expression.first_line
         else

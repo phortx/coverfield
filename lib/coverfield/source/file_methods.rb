@@ -1,3 +1,4 @@
+# Mixin for shared methods between TestFile and File
 module Coverfield::Source::FileMethods
   attr_reader :file_name
 
@@ -9,6 +10,6 @@ module Coverfield::Source::FileMethods
 
   # Returns the file name relative to the app root
   public def relative_file_name
-    @file_name.gsub(APP_ROOT + '/', '')
+    @file_name.gsub(@config.app_root + '/', '')
   end
 end
